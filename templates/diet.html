@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Diet Plans - Gym Analytics{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-container">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1><i class="fas fa-utensils"></i> Diet & Nutrition</h1>
+                <p>Manage your diet plans and track meals</p>
+            </div>
+            {% if current_user.role == 'member' %}
+            <button class="btn btn-primary" data-modal="addDietPlanModal">
+                <i class="fas fa-plus"></i> Create Diet Plan
+            </button>
+            {% endif %}
+        </div>
+        
+        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+            <!-- Diet Plans -->
+            <div class="dashboard-main">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-clipboard-list"></i> Diet Plans</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if diet_plans %}
+                        {% for plan in diet_plans %}
+                        <div class="diet-plan-card">
+                            <div class="diet-plan-header">
+                                <div>
+                                    <h4>{{ plan.plan_name }}</h4>
+                                    <span class="status {{ 'status-active' if plan.is_active else 'status-inactive' }}">
+                                        {{ 'Active' if plan.is_active else 'Inactive' }}
+                                    </span>
+                                </div>
+                                <div class="diet-plan-macros">
+                                    <div class="macro">
+                                        <div class="value">{{ plan.daily_calories or 0 }}</div>
+                                        <div class="label">Calories</div>
+                                    </div>
+                                    <div class="macro">
+                                        <div class="value">{{ plan.daily_protein or 0 }}g</div>
+                                        <div class="label">Protein</div>
+                                    </div>
+                                    <div class="macro">
+                                        <div class="value">{{ plan.daily_carbs or 0 }}g</div>
+                                        <div class="label">Carbs</div>
+                                    </div>
+                                    <div class="macro">
+                                        <div class="value">{{ plan.daily_fat or 0 }}g</div>
+                                        <div class="label">Fat</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="diet-plan-body">
+                                <p style="color: var(--text-secondary);">{{ plan.description or 'No description provided.' }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-utensils" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h3>No Diet Plans</h3>
+                            <p>Create your first diet plan to start tracking your nutrition!</p>
+                            {% if current_user.role == 'member' %}
+                            <button class="btn btn-primary mt-2" data-modal="addDietPlanModal">
+                                <i class="fas fa-plus"></i> Create Diet Plan
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar - Log Meal -->
+            <div class="dashboard-sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-plus-circle"></i> Log Meal</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if current_user.role == 'member' %}
+                        <form method="POST" action="{{ url_for('log_meal') }}">
+                            <div class="form-group">
+                                <label class="form-label">Meal Type</label>
+                                <select name="meal_type" class="form-control form-select" required>
+                                    <option value="">Select meal</option>
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="snack">Snack</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Meal Name</label>
+                                <input type="text" name="meal_name" class="form-control" placeholder="e.g., Grilled Chicken Salad">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Calories</label>
+                                <input type="number" name="calories" class="form-control" placeholder="0" min="0">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Protein (g)</label>
+                                    <input type="number" name="protein" class="form-control" placeholder="0" min="0" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Carbs (g)</label>
+                                    <input type="number" name="carbs" class="form-control" placeholder="0" min="0" step="0.1">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Fat (g)</label>
+                                <input type="number" name="fat" class="form-control" placeholder="0" min="0" step="0.1">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-save"></i> Log Meal
+                            </button>
+                        </form>
+                        {% else %}
+                        <p style="color: var(--text-secondary);">Only members can log meals.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Recent Meals -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history"></i> Recent Meals</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if meal_logs %}
+                        {% for meal in meal_logs[:5] %}
+                        <div class="meal-item">
+                            <div class="meal-icon">
+                                <i class="fas fa-{{ 'coffee' if meal.meal_type == 'breakfast' else 'sun' if meal.meal_type == 'lunch' else 'moon' if meal.meal_type == 'dinner' else 'cookie' }}"></i>
+                            </div>
+                            <div class="meal-info">
+                                <h5>{{ meal.meal_name or meal.meal_type|title }}</h5>
+                                <p>{{ meal.logged_at.strftime('%Y-%m-%d %H:%M') if meal.logged_at else '-' }}</p>
+                            </div>
+                            <div class="meal-calories">{{ meal.calories or 0 }} cal</div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p style="color: var(--text-secondary);">No meals logged yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Diet Plan Modal -->
+<div class="modal" id="addDietPlanModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-clipboard-list"></i> Create Diet Plan</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('add_diet_plan') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Plan Name</label>
+                    <input type="text" name="plan_name" class="form-control" placeholder="e.g., Weight Loss Plan" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Plan Type</label>
+                    <select name="plan_type" class="form-control form-select">
+                        <option value="maintenance">Maintenance</option>
+                        <option value="weight_loss">Weight Loss</option>
+                        <option value="muscle_gain">Muscle Gain</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Daily Calories</label>
+                        <input type="number" name="daily_calories" class="form-control" placeholder="2000" value="2000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Daily Protein (g)</label>
+                        <input type="number" name="daily_protein" class="form-control" placeholder="50" value="50" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Daily Carbs (g)</label>
+                        <input type="number" name="daily_carbs" class="form-control" placeholder="250" value="250" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Daily Fat (g)</label>
+                        <input type="number" name="daily_fat" class="form-control" placeholder="65" value="65" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Describe your diet plan..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Plan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

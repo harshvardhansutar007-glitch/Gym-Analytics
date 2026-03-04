@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gym Analytics{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Welcome back, {{ current_user.get_full_name() }}!</h1>
+            <p>Here's what's happening with your gym today.</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            {% if current_user.role == 'admin' %}
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.total_members }}</h4>
+                    <p>Total Members</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.total_trainers }}</h4>
+                    <p>Total Trainers</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.total_workouts }}</h4>
+                    <p>Total Workouts</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.today_attendance }}</h4>
+                    <p>Today's Attendance</p>
+                </div>
+            </div>
+            {% elif current_user.role == 'member' %}
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.total_workouts }}</h4>
+                    <p>Total Workouts</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.today_calories }}</h4>
+                    <p>Calories Today</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>0</h4>
+                    <p>Diet Plans</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>0</h4>
+                    <p>Attendance</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ stats.total_workouts }}</h4>
+                    <p>Total Workouts</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Main Content -->
+            <div class="dashboard-main">
+                <!-- Workout Chart -->
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> Weekly Workouts</h3>
+                    <div class="chart-container">
+                        <canvas id="workoutChart" 
+                                data-labels="{{ workout_dates | tojson }}" 
+                                data-data="{{ workout_counts | tojson }}"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Workouts -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history"></i> Recent Workouts</h3>
+                        <a href="{{ url_for('workouts') }}" class="btn btn-sm btn-secondary">View All</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Workout</th>
+                                    <th>Duration</th>
+                                    <th>Calories</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_workouts %}
+                                {% for workout in recent_workouts %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ workout.workout_name or workout.workout_type }}</strong>
+                                    </td>
+                                    <td>{{ workout.duration_minutes }} min</td>
+                                    <td>{{ workout.calories_burned or 0 }} cal</td>
+                                    <td>{{ workout.workout_date.strftime('%Y-%m-%d') if workout.workout_date else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center" style="color: var(--text-secondary);">
+                                        No workouts logged yet. <a href="{{ url_for('workouts') }}" style="color: var(--accent);">Log your first workout!</a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="dashboard-sidebar">
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ url_for('workouts') }}" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-plus"></i> Log Workout
+                        </a>
+                        <a href="{{ url_for('diet') }}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-utensils"></i> Log Meal
+                        </a>
+                        <a href="{{ url_for('analytics') }}" class="btn btn-secondary w-100">
+                            <i class="fas fa-chart-pie"></i> View Analytics
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Announcements (Admin only) -->
+                {% if current_user.role == 'admin' and announcements %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bullhorn"></i> Announcements</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for announcement in announcements %}
+                        <div class="meal-item" style="margin-bottom: 1rem;">
+                            <div class="meal-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="meal-info">
+                                <h5>{{ announcement.title }}</h5>
+                                <p>{{ announcement.content[:50] }}...</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Member Profile Summary -->
+                {% if current_user.role == 'member' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user"></i> My Profile</h3>
+                    </div>
+                    <div class="card-body" style="text-align: center;">
+                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4>{{ current_user.get_full_name() }}</h4>
+                        <p style="color: var(--text-secondary);">{{ current_user.email }}</p>
+                        <span class="status status-active" style="margin-top: 0.5rem; display: inline-block;">Active Member</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Gym Analytics - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-floating">
+        <div class="floating-icon"><i class="fas fa-dumbbell"></i></div>
+        <div class="floating-icon"><i class="fas fa-heartbeat"></i></div>
+        <div class="floating-icon"><i class="fas fa-fire"></i></div>
+        <div class="floating-icon"><i class="fas fa-chart-line"></i></div>
+    </div>
+    
+    <div class="hero-content">
+        <span class="hero-badge"><i class="fas fa-star"></i> #1 Gym Management Platform</span>
+        
+        <h1>Transform Your <span>Gym</span> With Analytics</h1>
+        
+        <p>Comprehensive workout tracking, diet management, and progress analytics. Everything you need to achieve your fitness goals in one powerful platform.</p>
+        
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus"></i> Get Started Free
+            </a>
+            <a href="#features" class="btn btn-secondary btn-lg">
+                <i class="fas fa-play"></i> Learn More
+            </a>
+        </div>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <h3>10K+</h3>
+                <p>Active Members</p>
+            </div>
+            <div class="hero-stat">
+                <h3>500+</h3>
+                <p>Trainers</p>
+            </div>
+            <div class="hero-stat">
+                <h3>100+</h3>
+                <p>Gym Partners</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <h2>Powerful <span class="highlight">Features</span></h2>
+            <p>Everything you need to manage your gym effectively and help members achieve their fitness goals.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <h3>Workout Tracking</h3>
+                <p>Log and track workouts with detailed exercise descriptions, sets, reps, and weights. Monitor progress over time.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>Diet Management</h3>
+                <p>Create personalized diet plans, track meals, and monitor nutritional intake with detailed macro tracking.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Progress Analytics</h3>
+                <p>Visualize fitness progress with beautiful charts and graphs. Track weight, body measurements, and performance.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Member Management</h3>
+                <p>Easily manage members, track attendance, handle memberships, and communicate with your gym community.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>Trainer Management</h3>
+                <p>Assign trainers to members, track trainer schedules, and manage certifications and specializations.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Friendly</h3>
+                <p>Access your gym data anywhere, anytime. Fully responsive design works perfectly on all devices.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="section section-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our <span class="highlight">Services</span></h2>
+            <p>Comprehensive solutions for gym owners, trainers, and fitness enthusiasts.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>Gym Management</h3>
+                <p>Complete administrative tools for managing your gym operations efficiently.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Personal Training</h3>
+                <p>Trainers can create custom workout plans and track client progress easily.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Attendance Tracking</h3>
+                <p>Monitor gym visits, track member check-ins, and manage peak hours.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section section-dark">
+    <div class="container" style="text-align: center;">
+        <div class="section-header">
+            <h2>Ready to <span class="highlight">Get Started?</span></h2>
+            <p>Join thousands of gyms and fitness enthusiasts already using Gym Analytics.</p>
+        </div>
+        
+        <div class="hero-buttons" style="justify-content: center;">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus"></i> Create Free Account
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        </div>
+        
+        <p style="margin-top: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-check" style="color: var(--accent-secondary);"></i> No credit card required
+            <span style="margin: 0 1rem;">|</span>
+            <i class="fas fa-check" style="color: var(--accent-secondary);"></i> Free 30-day trial
+            <span style="margin: 0 1rem;">|</span>
+            <i class="fas fa-check" style="color: var(--accent-secondary);"></i> Cancel anytime
+        </p>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="section section-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>About <span class="highlight">Gym Analytics</span></h2>
+            <p>We are dedicated to helping gyms and fitness enthusiasts achieve their goals through data-driven insights and powerful management tools.</p>
+        </div>
+        
+        <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <div class="card" style="padding: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 60px; height: 60px; background: var(--gradient-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bullseye" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h3 style="margin: 0;">Our Mission</h3>
+                </div>
+                <p style="color: var(--text-secondary);">To empower gyms, trainers, and fitness enthusiasts with powerful analytics and management tools that drive results.</p>
+            </div>
+            
+            <div class="card" style="padding: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #16c79a 0%, #11998e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-eye" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h3 style="margin: 0;">Our Vision</h3>
+                </div>
+                <p style="color: var(--text-secondary);">To become the leading gym management and fitness analytics platform globally.</p>
+            </div>
+            
+            <div class="card" style="padding: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-heart" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h3 style="margin: 0;">Why Choose Us</h3>
+                </div>
+                <p style="color: var(--text-secondary);">Comprehensive features, user-friendly interface, and dedicated support make us the best choice for your gym.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

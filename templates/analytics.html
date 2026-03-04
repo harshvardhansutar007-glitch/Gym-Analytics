@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Gym Analytics{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-chart-line"></i> Analytics</h1>
+            <p>Track your progress and view detailed insights</p>
+        </div>
+        
+        {% if current_user.role == 'admin' %}
+        <!-- Admin Analytics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ total_members }}</h4>
+                    <p>Total Members</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ active_members }}</h4>
+                    <p>Active Members</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ ((active_members / total_members * 100) if total_members > 0 else 0)|int }}%</h4>
+                    <p>Retention Rate</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+            <!-- Member Growth Chart -->
+            <div class="chart-card">
+                <h3><i class="fas fa-users"></i> Member Growth</h3>
+                <div class="chart-container">
+                    <canvas class="analytics-chart" 
+                            data-chart-type="line"
+                            data-labels="{{ member_dates | tojson }}" 
+                            data-data="{{ member_counts | tojson }}"
+                            data-label="Members"></canvas>
+                </div>
+            </div>
+            
+            <!-- Workout Types Distribution -->
+            <div class="chart-card">
+                <h3><i class="fas fa-dumbbell"></i> Workout Types</h3>
+                <div class="chart-container">
+                    <canvas class="analytics-chart"
+                            data-chart-type="doughnut"
+                            data-labels="{{ workout_types | map(attribute=0) | list | tojson }}"
+                            data-data="{{ workout_types | map(attribute=1) | list | tojson }}"
+                            data-label="Workouts"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Revenue Analytics -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-dollar-sign"></i> Revenue by Membership Type</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-grid" style="margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${{ membership_revenue.get('basic', 0) }}</h4>
+                            <p>Basic Members</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${{ membership_revenue.get('premium', 0) }}</h4>
+                            <p>Premium Members</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>${{ membership_revenue.get('vip', 0) }}</h4>
+                            <p>VIP Members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% elif current_user.role == 'member' %}
+        <!-- Member Analytics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ total_members }}</h4>
+                    <p>Total Workouts</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ active_members }}</h4>
+                    <p>Meals Logged</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+            <!-- Calories Chart -->
+            <div class="chart-card">
+                <h3><i class="fas fa-fire"></i> Calories Intake</h3>
+                <div class="chart-container">
+                    <canvas class="analytics-chart"
+                            data-chart-type="line"
+                            data-labels="{{ member_dates | tojson }}"
+                            data-data="{{ member_counts | tojson }}"
+                            data-label="Calories"></canvas>
+                </div>
+            </div>
+            
+            <!-- Workout Types -->
+            <div class="chart-card">
+                <h3><i class="fas fa-dumbbell"></i> Workout Distribution</h3>
+                <div class="chart-container">
+                    <canvas class="analytics-chart"
+                            data-chart-type="pie"
+                            data-labels="{{ workout_types | map(attribute=0) | list | tojson }}"
+                            data-data="{{ workout_types | map(attribute=1) | list | tojson }}"
+                            data-label="Workouts"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Member Profile Stats -->
+        {% if member %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-user"></i> My Profile Stats</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-grid" style="margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-ruler-vertical"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ member.height or '-' }} cm</h4>
+                            <p>Height</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ member.weight or '-' }} kg</h4>
+                            <p>Current Weight</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #16c79a 0%, #11998e 100%);">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ member.target_weight or '-' }} kg</h4>
+                            <p>Target Weight</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ member.fitness_goal|upper if member.fitness_goal else 'N/A' }}</h4>
+                            <p>Fitness Goal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- Trainer Analytics -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-bar"></i> Overview</h3>
+            </div>
+            <div class="card-body">
+                <p style="color: var(--text-secondary);">Trainer analytics coming soon!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

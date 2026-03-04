@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Workouts - Gym Analytics{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-container">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1><i class="fas fa-running"></i> Workouts</h1>
+                <p>Track and manage your workouts</p>
+            </div>
+            <button class="btn btn-primary" data-modal="logWorkoutModal">
+                <i class="fas fa-plus"></i> Log Workout
+            </button>
+        </div>
+        
+        <!-- Workout Types Filter -->
+        <div class="workout-types">
+            <a href="{{ url_for('workouts') }}" class="workout-type-btn {{ 'active' if not selected_type else '' }}">
+                All
+            </a>
+            {% for wtype in ['strength', 'cardio', 'hiit', 'yoga', 'flexibility'] %}
+            <a href="{{ url_for('workouts', type=wtype) }}" class="workout-type-btn {{ 'active' if selected_type == wtype else '' }}">
+                {{ wtype|title }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        <!-- Workouts List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-list"></i> Workout History</h3>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Duration</th>
+                            <th>Calories</th>
+                            <th>Intensity</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if workouts %}
+                        {% for workout in workouts %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div class="workout-type-icon" style="width: 40px; height: 40px; font-size: 1rem;">
+                                        <i class="fas fa-{{ 'dumbbell' if workout.workout_type == 'strength' else 'running' if workout.workout_type == 'cardio' else 'fire' if workout.workout_type == 'hiit' else 'spa' if workout.workout_type == 'yoga' else 'stretching' }}"></i>
+                                    </div>
+                                    <strong>{{ workout.workout_type|title }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ workout.workout_name or '-' }}</td>
+                            <td>{{ workout.duration_minutes }} min</td>
+                            <td>{{ workout.calories_burned or 0 }} cal</td>
+                            <td>
+                                <span class="status {{ 'status-active' if workout.intensity == 'high' else 'status-pending' if workout.intensity == 'medium' else 'status-inactive' }}">
+                                    {{ workout.intensity|title }}
+                                </span>
+                            </td>
+                            <td>{{ workout.workout_date.strftime('%Y-%m-%d') if workout.workout_date else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 3rem; color: var(--text-secondary);">
+                                <i class="fas fa-running" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>No Workouts Yet</h3>
+                                <p>Start tracking your fitness journey by logging your first workout!</p>
+                                <button class="btn btn-primary mt-2" data-modal="logWorkoutModal">
+                                    <i class="fas fa-plus"></i> Log Your First Workout
+                                </button>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Workout Modal -->
+<div class="modal" id="logWorkoutModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-running"></i> Log Workout</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('log_workout') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Workout Type</label>
+                    <select name="workout_type" class="form-control form-select" required>
+                        <option value="">Select workout type</option>
+                        <option value="strength">Strength Training</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="hiit">HIIT</option>
+                        <option value="yoga">Yoga</option>
+                        <option value="flexibility">Flexibility</option>
+                        <option value="crossfit">CrossFit</option>
+                        <option value="swimming">Swimming</option>
+                        <option value="cycling">Cycling</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Workout Name (Optional)</label>
+                    <input type="text" name="workout_name" class="form-control" placeholder="e.g., Morning Chest Workout">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Duration (minutes)</label>
+                        <input type="number" name="duration" class="form-control" placeholder="60" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Calories Burned</label>
+                        <input type="number" name="calories" class="form-control" placeholder="300">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Intensity</label>
+                    <select name="intensity" class="form-control form-select">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Any additional notes about your workout..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Log Workout
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
